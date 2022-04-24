@@ -24,14 +24,13 @@ config = 'paraphraser_bert'
 paraphraser = build_model(config, download=False)
 
 # Microphone test
-"""for index, name in enumerate(sr.Microphone.list_microphone_names()):
+for index, name in enumerate(sr.Microphone.list_microphone_names()):
     print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 if index>1:
     print('Please, input the selected microphone index: ')
     selected_mic = int(input())
 else:
-    selected_mic = 0"""
-selected_mic = 3
+    selected_mic = 0
 
 # Text to speech init
 engine = pyttsx3.init()
