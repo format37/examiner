@@ -31,6 +31,8 @@ def tts(engine, tts_text):
 
 
 def main():
+
+    question_count_limit = 4
     
     use_gpt = len(sys.argv)==2 and sys.argv[1]=='gpt'
     if use_gpt:
@@ -87,6 +89,8 @@ def main():
         questions[i] = questions[i].replace('\n','')
     random.shuffle(questions)
 
+    questions = questions[:question_count_limit]
+
     answers = []
     chat_history = ''
 
@@ -118,10 +122,10 @@ def main():
                     chat_history += '|0|1|' + username_text
                     # robot phrase                
                     result = requests.post('http://localhost:8083/gpt', chat_history.replace('’',''))
-                    with open('data.pkl', 'wb') as fp:
+                    """with open('data.pkl', 'wb') as fp:
                         pickle.dump(result, fp)
                     with open('chat_history.txt', 'w') as f:
-                        f.write(chat_history.replace('’',''))
+                        f.write(chat_history.replace('’',''))"""
                     #examiner_text = 'test'
                     examiner_text = result.text
                     if not examiner_text=='':
