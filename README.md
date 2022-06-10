@@ -15,14 +15,20 @@ git clone https://github.com/format37/examiner
 cd examiner
 pip install requirements -r
 ```
-Configure your conf.json
+Configure your conf.json:
+* Address of Paraphrase server
+* Address of Text QA server
+* Address of Stt server
+* Questions count limit
+* Stop words. It can be any roles of speakers. For example, friend, collegue, client, etc.
+* Prompt. This text is example base for GPT-3 text generator. There is can be defined any conversation start or example, wich you can imagine.
 ### Run
 ```
 export OPENAI_API_KEY=your_key
 python examiner.py
 ```
 * Listen the question  
-* Answer by voice to microphone. Press Space, when you ends  
+* Answer by voice to microphone. Press Space, when you finish your speech  
 * After N questions, get your speech evaluation  
 ### Evaluation logic
 * Collect Robot's questions
