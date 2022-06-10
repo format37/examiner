@@ -32,8 +32,7 @@ python examiner.py
 * After N questions, get your speech evaluation  
 ### Evaluation logic
 * Collect Robot's questions
-* Collecting User's answers
-* Merging answers to single Text
-* Collecting automatic answers for each question by the Text
-* Paraphrase comparing between each user's and automatic answer. If answers are paraphrase, that answer is correct.
+* Merging User's answers to single Text
+* Using TextQA to collect Automatic answers for each question, based on the Text
+* Using paraphrase to compare each user's and automatic answer. If answers are paraphrase, that answer is correct.
 * Finally, calculate correct part of overall answers
