@@ -112,14 +112,18 @@ def wait_for_server_be_ready(server_address):
     print(dt.now(), 'server is ready')
 
 
-def accept_feature_extractor(phrases, accept):    
-    if len(accept)>1 and accept['text'] != '':        
-        accept_text = str(accept['text'])                
-        # accept_start = str(accept['result'][0]['start'])
-        # accept_end = accept['result'][-1:][0]['end']        
+def accept_feature_extractor(phrases, accept):
+    if len(accept) > 1 and accept['text'] != '':
+        accept_text = str(accept['text'])
         conf_score = []
         for result_rec in accept['result']:
-            # print('#', result_rec['conf'], result_rec['start'], result_rec['end'], result_rec['word'])
+            print(
+                '#',
+                result_rec['conf'],
+                result_rec['start'],
+                result_rec['end'],
+                result_rec['word']
+                )
             conf_score.append(float(result_rec['conf']))
         conf_mid = str(sum(conf_score)/len(conf_score))
         print('=== middle confidence:', conf_mid, '\n')
@@ -132,9 +136,11 @@ async def stt(uri, file_name):
 
         phrases = []
 
-        wf = wave.open(file_name, "rb")        
-        await websocket.send('{ "config" : { "sample_rate" : %d } }' % (wf.getframerate()))
-        buffer_size = int(wf.getframerate() * 0.2) # 0.2 seconds of audio
+        wf = wave.open(file_name, "rb")
+        await websocket.send(
+            '{ "config" : { "sample_rate" : %d } }' % (wf.getframerate())
+            )
+        buffer_size = int(wf.getframerate() * 0.2)  # 0.2 seconds of audio
         while True:
             data = wf.readframes(buffer_size)
 
@@ -142,11 +148,11 @@ async def stt(uri, file_name):
                 break
 
             await websocket.send(data)
-            accept = json.loads(await websocket.recv())					
+            accept = json.loads(await websocket.recv())
             accept_feature_extractor(phrases, accept)
 
         await websocket.send('{"eof" : 1}')
-        accept = json.loads(await websocket.recv())		
+        accept = json.loads(await websocket.recv())
         accept_feature_extractor(phrases, accept)
 
         return ' '.join(phrases)
@@ -182,19 +188,19 @@ def main():
     # Text to speech init
     engine = pyttsx3.init()
     rate = engine.getProperty('rate')
-    engine.setProperty('rate', rate-50) # slow down
+    engine.setProperty('rate', rate-50)  # slow down
     engine.setProperty('voice', 'english-us')
-    
+
     # openai init
     prompt = config['prompt']
     stop_words = config['stop_words']
 
     questions = []
     answers = []
-    
+
     # conversation
     current_question = config['questions_count_limit']
-    while int(config['questions_count_limit'])==0 or current_question>0:
+    while int(config['questions_count_limit']) == 0 or current_question > 0:
         examiner_text = text_davinci(prompt, stop_words)['choices'][0]['text']
         prompt += examiner_text
         questions.append(examiner_text)
@@ -208,7 +214,6 @@ def main():
         prompt += '\nCandidate: ' + user_text + '\nHr: '
         current_question -= 1
 
-
     # === Evaluate
 
     # textqa
@@ -217,13 +222,13 @@ def main():
     for _ in range(len(questions)):
         texts.append(text)
 
-    request = {'texts':texts,'questions':questions}
+    request = {'texts': texts, 'questions': questions}
     request_str = json.dumps(request)
     response = requests.post(textqa_server+'/inference', json=request_str)
     response = json.loads(response.text)
 
     for i in range(len(response[0])):
-        print(questions[i],'->',response[0][i],'\n')
+        print(questions[i], '->', response[0][i], '\n')
 
     # Paraphrases
     text_a = []
@@ -232,23 +237,23 @@ def main():
         text_a.append(answers[i])
         text_b.append(response[0][i])
 
-    data = {'text_a':text_a,'text_b':text_b}
+    data = {'text_a': text_a, 'text_b': text_b}
     request_str = json.dumps(data)
     response = requests.post(paraphrase_server+'/inference', json=request_str)
     paraphrase_eval = string_to_array(response.text)
-    
+
     for i in range(len(paraphrase_eval)):
         print('+' if paraphrase_eval[i] else '-', questions[i], 'answer:')
-        print(answers[i],'\n')
+        print(answers[i], '\n')
 
-    print('Answers length: ',len(text))
-    print('Words count: ',len(text.split(' ')))
-    print('Unique words count: ',len(set(text.split(' '))))
+    print('Answers length: ', len(text))
+    print('Words count: ', len(text.split(' ')))
+    print('Unique words count: ', len(set(text.split(' '))))
 
     correct = int(sum(paraphrase_eval)*100/len(paraphrase_eval))
     examiner_text = 'You have '+str(correct)+' percent of correct answers. '
     print(examiner_text)
-    examiner_text += 'Good job!' if correct>=70 else 'You need to improve!'
+    examiner_text += 'Good job!' if correct >= 70 else 'You need to improve!'
     tts(engine, examiner_text)
 
 if __name__ == '__main__':
