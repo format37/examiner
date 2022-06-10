@@ -1,0 +1,8 @@
+{
+"paraphrase_server": "http://192.168.1.11:10000",
+"textqa_server": "http://192.168.1.11:10002",
+"stt_server": "ws://localhost:2700",
+"questions_count_limit": 10,
+"stop_words": ["Hr:", "Candidate:"], 
+"prompt": "Candidate name is Alex.\nDialogue starts from a quick small talk. Then candidate ask several behavioral questions. Subsequently, technical questions. And finally, candidate asks Hr about job.\nBelow is a dialogue of Hr with Candidate for Machine learning engineer position.\n\nHr: Hello! My name is Jane. And you?\nCandidate: Hi! My name is Alex.\nHr:"
+}
