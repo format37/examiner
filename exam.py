@@ -204,8 +204,9 @@ def main():
     engine.setProperty('voice', 'english-us')
 
     # openai init
-    prompt = config['prompt']
     stop_words = config['stop_words']
+    prompt = config['prompt']
+    print(prompt)
 
     questions = []
     answers = []

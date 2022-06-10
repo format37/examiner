@@ -8,7 +8,7 @@ Transcribation requirements:
 Text generation requirements:  
 * Openai account with Api key and Correct payment settings  
   
-Evaluation requirements:  
+Evaluation requirements (Not required, if evaluation set to 0 in config.json):  
 * Nvidia GPU + Builded [paraphrase docker image](https://github.com/format37/nlp)  
 * Nvidia GPU + Builded [textqa docker image](https://github.com/format37/nlp)  
 ### Installation
@@ -18,9 +18,10 @@ cd examiner
 pip install requirements -r
 ```
 Configure your conf.json:
+* Address of Stt server
+* Evaluation feature
 * Address of Paraphrase server
 * Address of Text QA server
-* Address of Stt server
 * Questions count limit
 * Stop words. It can be any roles of speakers. For example, friend, collegue, client, etc.
 * Prompt. This text is example base for GPT-3 text generator. There is can be defined any conversation start or example, wich you can imagine.
@@ -32,6 +33,7 @@ python examiner.py
 * Listen the question  
 * Answer by voice to microphone. Press Space, when you finish your speech  
 * After N questions, get your speech evaluation  
+* Press Escape while your voice recording, when you ready to complete the dialog
 ### Evaluation logic
 * Collect Robot's questions
 * Merging User's answers to single Text
