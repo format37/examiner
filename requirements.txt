@@ -1,6 +1,2 @@
-#SpeechRecognition
 pyttsx3
-# deeppavlov
 openai
-# google speech
-# google-cloud-speech
