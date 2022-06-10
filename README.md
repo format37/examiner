@@ -4,8 +4,10 @@ Robot, performing English conversation with user. Conversation theme is based on
 Transcribation requirements:  
 * Microphone  
 * Nvidia GPU + Builded [vosk docker image](https://github.com/format37/stt)  
+  
 Text generation requirements:  
 * Openai account with Api key and Correct payment settings  
+  
 Evaluation requirements:  
 * Nvidia GPU + Builded [paraphrase docker image](https://github.com/format37/nlp)  
 * Nvidia GPU + Builded [textqa docker image](https://github.com/format37/nlp)  
