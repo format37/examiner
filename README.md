@@ -34,5 +34,5 @@ python examiner.py
 * Collect Robot's questions
 * Merging User's answers to single Text
 * Using TextQA to collect Automatic answers for each question, based on the Text
-* Using paraphrase to compare each user's and automatic answer. If answers are paraphrase, that answer is correct.
+* Using Paraphrase to compare each user's and automatic answer. If answers are paraphrase, that answer is correct.
 * Finally, calculate correct part of overall answers
