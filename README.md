@@ -18,6 +18,7 @@ pip install requirements -r
 Configure your conf.json
 ### Run
 ```
+export OPENAI_API_KEY=your_key
 python examiner.py
 ```
 * Listen the question  
