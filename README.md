@@ -4,10 +4,12 @@ Robot, performing English conversation with user. Conversation theme is based on
 Transcribation requirements:  
 * Microphone  
 * Nvidia GPU + Builded [vosk](https://github.com/format37/stt) docker image  
-* Nvidia GPU + Builded [nemo](https://github.com/format37/tts/tree/main/nemo) docker image  
   
 Text generation requirements:  
 * Openai account with Api key and Correct payment settings  
+  
+Speech synthesis requirements:
+* Nvidia GPU + Builded [nemo](https://github.com/format37/tts/tree/main/nemo) docker image  
   
 Evaluation requirements (Not required, if evaluation set to 0 in config.json):  
 * Nvidia GPU + Builded [paraphrase](https://github.com/format37/nlp) docker image  
