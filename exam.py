@@ -1,3 +1,4 @@
+from multiprocessing.connection import wait
 import pygame
 import pyaudio
 import wave
@@ -7,13 +8,25 @@ import json
 import requests
 from datetime import datetime as dt
 import time
-import pyttsx3
+#import pyttsx3
 import asyncio
 import websockets
 import wave
 
 
-def record_audio(file_name, current_question):
+def wait_for_server(definition, address):
+    print('Wait for '+definition+' server..')
+    while True:
+        try:
+            answer = requests.get(address)
+            if answer.status_code == 200 and answer.text == 'ok':
+                print(dt.now(), definition+' is ready!')
+                break
+        except Exception as e:
+            pass
+        time.sleep(1)
+
+def record_audio(file_name, current_question):    
     """
     Record audio file from PC microphone
     Until Space key not pressed
@@ -86,12 +99,26 @@ def record_audio(file_name, current_question):
     return escape
 
 
-def tts(engine, tts_text):
+def tts_v0(engine, tts_text):
     try:
         engine.say(tts_text)
         engine.runAndWait()
     except Exception as e:
         print('tts error while ttsing', tts_text, e)
+
+def tts(tts_server, tts_text):
+    data={'text': tts_text}
+    request_str = json.dumps(data)
+    response = requests.post(tts_server+'/inference', json=request_str)
+    # Save response as audio file
+    with open("audio.wav", "wb") as f:
+        f.write(response.content)
+    # Play audio file
+    pygame.mixer.init()
+    pygame.mixer.music.load("audio.wav")
+    pygame.mixer.music.play()
+    while pygame.mixer.music.get_busy():
+        time.sleep(0.1)
 
 
 def text_davinci(prompt, stop_words):
@@ -175,6 +202,9 @@ def main():
         print("# error: OPENAI_API_KEY is not set")
         return
 
+    tts_server = 'http://localhost:10005'
+    wait_for_server_be_ready(tts_server)
+
     # get dictionary from text file (config.txt)
     # 1. candidate name
     # 2. candidate role
@@ -198,10 +228,10 @@ def main():
         wait_for_server_be_ready(textqa_server)
 
     # Text to speech init
-    engine = pyttsx3.init()
+    """engine = pyttsx3.init()
     rate = engine.getProperty('rate')
     engine.setProperty('rate', rate-50)  # slow down
-    engine.setProperty('voice', 'english-us')
+    engine.setProperty('voice', 'english-us')"""
 
     # openai init
     stop_words = config['stop_words']
@@ -217,7 +247,8 @@ def main():
         examiner_text = text_davinci(prompt, stop_words)['choices'][0]['text']
         prompt += examiner_text
         questions.append(examiner_text)
-        tts(engine, examiner_text)
+        #tts(engine, examiner_text)
+        tts(tts_server, examiner_text)
         # record audio
         escape = record_audio('user.wav', current_question)
         # transcribe and receive response
@@ -278,7 +309,8 @@ def main():
             examiner_text += 'Good job!'
         else:
             examiner_text += 'You need to improve!'
-        tts(engine, examiner_text)
+        #tts(engine, examiner_text)
+        tts(tts_server, examiner_text)
 
 if __name__ == '__main__':
     main()

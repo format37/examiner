@@ -3,14 +3,15 @@ Robot, performing English conversation with user. Conversation theme is based on
 ### Requirements
 Transcribation requirements:  
 * Microphone  
-* Nvidia GPU + Builded [vosk docker image](https://github.com/format37/stt)  
+* Nvidia GPU + Builded [vosk](https://github.com/format37/stt) docker image  
+* Nvidia GPU + Builded [nemo](https://github.com/format37/tts/tree/main/nemo) docker image  
   
 Text generation requirements:  
 * Openai account with Api key and Correct payment settings  
   
 Evaluation requirements (Not required, if evaluation set to 0 in config.json):  
-* Nvidia GPU + Builded [paraphrase docker image](https://github.com/format37/nlp)  
-* Nvidia GPU + Builded [textqa docker image](https://github.com/format37/nlp)  
+* Nvidia GPU + Builded [paraphrase](https://github.com/format37/nlp) docker image  
+* Nvidia GPU + Builded [textqa](https://github.com/format37/nlp) docker image  
 ### Installation
 ```
 git clone https://github.com/format37/examiner
@@ -32,8 +33,8 @@ python examiner.py
 ```
 * Listen the question  
 * Answer by voice to microphone. Press Space, when you finish your speech  
-* After N questions, get your speech evaluation  
-* Press Escape while your voice recording, when you ready to complete the dialog
+* Press Escape while your voice recording, when you ready to complete the dialog  
+* Get your speech evaluation, if evaluation feature is enabled
 ### Evaluation logic
 * Collect Robot's questions
 * Merging User's answers to single Text
