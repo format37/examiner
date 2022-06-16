@@ -1,0 +1,9 @@
+{
+    "stt_server": "ws://localhost:2700",
+    "evaluation": 0,
+    "paraphrase_server": "http://192.168.1.11:10000",
+    "textqa_server": "http://192.168.1.11:10002",
+    "questions_count_limit": 0,
+    "stop_words": ["Psychologist:", "Patient:"], 
+    "prompt": "Psychologist: Hello! My name is Jane. And you?\nPatient: Hi! My name is Alex.\nPsychologist:"
+}

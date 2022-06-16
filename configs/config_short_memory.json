@@ -1,0 +1,10 @@
+{
+    "stt_server": "ws://192.168.1.11:2700",
+    "tts_server": "http://192.168.1.11:10005",
+    "evaluation": 0,
+    "paraphrase_server": "http://192.168.1.11:10000",
+    "textqa_server": "http://192.168.1.11:10002",
+    "questions_count_limit": 0,
+    "stop_words": ["Alex:", "Bob:"], 
+    "prompt": "Small talk conversation"
+}
