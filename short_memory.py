@@ -1,3 +1,4 @@
+from dataclasses import replace
 from multiprocessing.connection import wait
 import pygame
 import pyaudio
@@ -26,7 +27,7 @@ def wait_for_server(definition, address):
             pass
         time.sleep(1)
 
-def record_audio(file_name, current_question):    
+def record_audio(file_name):    
     """
     Record audio file from PC microphone
     Until Space key not pressed
@@ -99,13 +100,6 @@ def record_audio(file_name, current_question):
     return escape
 
 
-def tts_v0(engine, tts_text):
-    try:
-        engine.say(tts_text)
-        engine.runAndWait()
-    except Exception as e:
-        print('tts error while ttsing', tts_text, e)
-
 def tts(tts_server, tts_text):
     data={'text': tts_text}
     request_str = json.dumps(data)
@@ -119,9 +113,6 @@ def tts(tts_server, tts_text):
     pygame.mixer.music.play()
     while pygame.mixer.music.get_busy():
         time.sleep(0.1)
-    # close file
-    pygame.mixer.music.stop()
-    pygame.mixer.quit()
 
 
 def text_davinci(prompt, stop_words):
@@ -139,7 +130,7 @@ def text_davinci(prompt, stop_words):
 
 
 def wait_for_server_be_ready(server_address, name):
-    print(dt.now(), 'waiting for '+name+' server.. '+server_address)
+    print(dt.now(), 'waiting for '+name+' server..')
     r = ''
     while r == '':
         try:
@@ -155,13 +146,13 @@ def accept_feature_extractor(phrases, accept):
         accept_text = str(accept['text'])
         conf_score = []
         for result_rec in accept['result']:
-            print(
+            """print(
                 '#',
                 result_rec['conf'],
                 result_rec['start'],
                 result_rec['end'],
                 result_rec['word']
-                )
+                )"""
             conf_score.append(float(result_rec['conf']))
         conf_mid = str(sum(conf_score)/len(conf_score))
         print('=== middle confidence:', conf_mid, '\n')
@@ -208,109 +199,45 @@ def main():
     with open('config.json', 'r') as f:
         config = json.load(f)
 
-    # tts server init
     tts_server = config['tts_server']
     wait_for_server_be_ready(tts_server, 'tts')
 
     # stt server init
-    stt_server = config['stt_server']
-
-    # evaluation init
-    do_evaluation = config['evaluation']
-
-    if do_evaluation:
-        # paraphrase init
-        paraphrase_server = config['paraphrase_server']
-        wait_for_server_be_ready(paraphrase_server, 'paraphrase')
-
-        # textqa init
-        textqa_server = config['textqa_server']
-        wait_for_server_be_ready(textqa_server, 'text_qa')
-
-    # Text to speech init
-    """engine = pyttsx3.init()
-    rate = engine.getProperty('rate')
-    engine.setProperty('rate', rate-50)  # slow down
-    engine.setProperty('voice', 'english-us')"""
+    stt_server = config['stt_server']   
 
     # openai init
     stop_words = config['stop_words']
     prompt = config['prompt']
-    print(prompt)
+    # print(prompt)
+    prompt_len = len(prompt.split('\n'))
 
-    questions = []
-    answers = []
-
-    # conversation
-    current_question = config['questions_count_limit']
-    while int(config['questions_count_limit']) == 0 or current_question > 0:
-        examiner_text = text_davinci(prompt, stop_words)['choices'][0]['text']
-        prompt += examiner_text
-        questions.append(examiner_text)
-        #tts(engine, examiner_text)
-        tts(tts_server, examiner_text)
+    while True:
+        print('=== ===', dt.now(), 'prompt:\n', prompt)
         # record audio
-        escape = record_audio('user.wav', current_question)
+        escape = record_audio('user.wav')
+        # convert ogg to wav
+        # os.system('ffmpeg -i user.ogg -ac 1 -ar 16000 user.wav -y')        
         # transcribe and receive response
-        user_text = asyncio.run(stt(stt_server, 'user.wav'))
-        print('user:', user_text)
-        answers.append(user_text)
-        prompt += '\n'+stop_words[1]+' ' + user_text + '\n'+stop_words[0]+' '
-        current_question -= 1
+        user_text = asyncio.run(stt(stt_server, 'user.wav'))        
+        prompt += '\n'+stop_words[0]+' ' + user_text + '\n'+stop_words[1]+' '
         if escape:
             print('Escape pressed')
             break
-
-    # === Evaluate
-    if do_evaluation:
-        # textqa
-        text = ' '.join(answers)
-        texts = []
-        for _ in range(len(questions)):
-            texts.append(text)
-
-        request = {'texts': texts, 'questions': questions}
-        request_str = json.dumps(request)
-        response = requests.post(textqa_server+'/inference', json=request_str)
-        response = json.loads(response.text)
-
-        for i in range(len(response[0])):
-            print(questions[i], '->', response[0][i], '\n')
-
-        # Paraphrases
-        text_a = []
-        text_b = []
-        for i in range(len(response[0])):
-            text_a.append(answers[i])
-            text_b.append(response[0][i])
-
-        data = {'text_a': text_a, 'text_b': text_b}
-        request_str = json.dumps(data)
-        response = requests.post(
-            paraphrase_server+'/inference',
-            json=request_str
-            )
-        paraphrase_eval = string_to_array(response.text)
-
-        for i in range(len(paraphrase_eval)):
-            print('+' if paraphrase_eval[i] else '-', questions[i], 'answer:')
-            print(answers[i], '\n')
-
-        print('Answers length: ', len(text))
-        print('Words count: ', len(text.split(' ')))
-        print('Unique words count: ', len(set(text.split(' '))))
-
-        correct = int(sum(paraphrase_eval)*100/len(paraphrase_eval))
-        examiner_text = 'You have '
-        examiner_text += str(correct)
-        examiner_text += ' percent of correct answers. '
-        print(examiner_text)
-        if correct >= 70:
-            examiner_text += 'Good job!'
-        else:
-            examiner_text += 'You need to improve!'
-        #tts(engine, examiner_text)
+        # split prompt by strings
+        prompt_array = prompt.split('\n')
+        #print('array:', prompt_array)        
+        if len(prompt_array) > prompt_len+3:
+            # remove all elements from prompt, except first element and last 3 elements
+            prompt_array = [prompt_array[0]] + prompt_array[-(prompt_len+3-1):]
+        # restore promt from prompt_array
+        prompt = '\n'.join(prompt_array)        
+        examiner_text = text_davinci(str(prompt), stop_words)['choices'][0]['text']
+        # replace \n to ''
+        prompt += examiner_text.replace('\n', '')
         tts(tts_server, examiner_text)
+        
+    print('=== ===', dt.now(), 'prompt:\n', prompt)
+    
 
 if __name__ == '__main__':
     main()

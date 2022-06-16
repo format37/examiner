@@ -1,9 +1,10 @@
 {
-    "stt_server": "ws://localhost:2700",
+    "stt_server": "ws://192.168.1.11:2700",
+    "tts_server": "http://192.168.1.11:10005",
     "evaluation": 0,
     "paraphrase_server": "http://192.168.1.11:10000",
     "textqa_server": "http://192.168.1.11:10002",
-    "questions_count_limit": 10,
-    "stop_words": ["Hr:", "Candidate:"], 
-    "prompt": "Candidate name is Alex.\nDialogue starts from a quick small talk. Then candidate ask 3 behavioral questions. Subsequently, 4 technical questions. And finally, candidate asks Hr about job.\nBelow is a dialogue of Hr with Candidate for Machine learning engineer position.\n\nHr: Hello! My name is Jane. And you?\nCandidate: Hi! My name is Alex.\nHr:"
+    "questions_count_limit": 0,
+    "stop_words": ["Teacher:", "Student:"], 
+    "prompt": "Student name is Dima.\nDialogue starts from a quick small talk. Then Teacher get acquainted with Student. And after that they are speak about Japanese language lessons.\n\nTeacher: Hello! My name is Jane. And you?\nStudent: Hi! My name is Dima.\nTeacher:"
 }
